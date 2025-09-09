@@ -1,7 +1,11 @@
 [project]
-name = "python-template"
+name = "ragnarok-bot"
 version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
+description = "Telegram bot RagnarokMaster_bot"
+authors = ["Dima Whitesmith"]
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "aiogram==3.4.1",
+    "openai>=1.40.0",
+    "httpx>=0.27.0"
+]

@@ -1,0 +1,21 @@
+{
+  "user_id": 1077268346,
+  "name": "\u0414\u0438\u043c\u0430",
+  "gender": "male",
+  "class_type": "priest",
+  "level": 1,
+  "exp": 0,
+  "gold": 100,
+  "inventory": [],
+  "equipment": {
+    "weapon": null,
+    "armor": null
+  },
+  "current_health": 8,
+  "max_health": 8,
+  "quests": {
+    "active": null,
+    "completed": []
+  },
+  "last_save": "2025-09-09T18:42:26.163836"
+}
