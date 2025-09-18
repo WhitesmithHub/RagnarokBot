@@ -1,66 +1,41 @@
 # -*- coding: utf-8 -*-
 # app/features/character.py
 from __future__ import annotations
-
-from typing import Dict, List
-
 from aiogram import Router, F, types
-from aiogram.fsm.context import FSMContext
 
 from app.core.storage import get_player
 from app.ui.keyboards import city_menu_kb
 
 router = Router()
 
-def ability_uses_for_level(key: str, level: int, class_key: str) -> int:
-    """
-    Обязательная утилита: макс. заряды умения на уровне.
-    (Здесь оставь твою существующую логику; пример базовой.)
-    """
-    table = {
-        1: 3,
-        2: 4,
-        3: 5,
-    }
-    return table.get(level, 3)
+_DIGIT_EMOJI = {0:"0️⃣",1:"1️⃣",2:"2️⃣",3:"3️⃣",4:"4️⃣",5:"5️⃣",6:"6️⃣",7:"7️⃣",8:"8️⃣",9:"9️⃣"}
+
+def _num_to_emoji(n: int) -> str:
+    return "".join(_DIGIT_EMOJI[int(d)] for d in str(n))
+
+def _character_text(p) -> str:
+    need = 100 * p.level
+    skills_active = [k for k,v in (p.ability_meta or {}).items() if v.get("type")=="active"]
+    skills_passive = [k for k,v in (p.ability_meta or {}).items() if v.get("type")=="passive"]
+    act = "Активные: " + (", ".join(skills_active) if skills_active else "—")
+    pas = "Пассивные: " + (", ".join(skills_passive) if skills_passive else "—")
+    return (
+        "🧍 <b>Персонаж</b>\n"
+        f"Имя: {p.name}\n"
+        f"Класс: {p.class_label}\n"
+        f"Уровень: {_num_to_emoji(p.level)}\n"
+        f"Опыт: {p.exp} / {need}\n\n"
+        f"Характеристики:\n"
+        f"  💪 Сила: {p.strength}\n"
+        f"  🏃 Ловкость: {p.dexterity}\n"
+        f"  🧠 Интеллект: {p.intellect}\n"
+        f"  🫀 Выносливость: {p.endurance}\n"
+        f"❤️ HP: {p.hp}/{p.max_hp}\n"
+        f"Оружие: {p.equipment.get('weapon') or '—'} | Броня: {p.equipment.get('armor') or '—'}\n\n"
+        f"{act}\n{pas}"
+    )
 
 @router.message(F.text.in_(["🧍 Персонаж", "Персонаж"]))
-async def open_character(message: types.Message, state: FSMContext):
+async def show_character(message: types.Message):
     p = get_player(message.from_user.id)
-
-    lines: List[str] = [
-        "🧍 <b>Персонаж</b>",
-        f"🏷️ Имя: {p.name}",
-        f"🪪 Класс: {getattr(p, 'class_emoji', '⚔️')} {getattr(p, 'class_title', p.class_label)}",
-        f"⭐️ Уровень: {p.level}",
-        f"🔰 Опыт: {p.exp} / {p.exp_to_next}",
-        "",
-        "📘 <b>Умения</b>",
-        "Изученные:",
-    ]
-
-    if p.abilities_known:
-        charges: Dict[str, int] = getattr(p, "ability_charges", {})
-        for key, lvl in p.abilities_known.items():
-            meta = p.ability_meta.get(key, {"emoji": "✨", "title": key, "uses_by_level": {lvl: ability_uses_for_level(key, lvl, p.class_key)}})
-            max_uses = meta.get("uses_by_level", {}).get(lvl, ability_uses_for_level(key, lvl, p.class_key))
-            cur_uses = charges.get(key, max_uses)
-            lines.append(f"• {meta['emoji']} {meta['title']} — ур. {lvl}  (исп.: {cur_uses}/{max_uses})")
-    else:
-        lines.append("—")
-
-    # Кандидаты на изучение/улучшение — если у тебя есть функция available_abilities, используй её
-    if hasattr(p, "available_abilities"):
-        lines.append("\nМожно изучить/улучшить:")
-        options = p.available_abilities()
-        for i, opt in enumerate(options, start=1):
-            emoji = opt.get("emoji", "✨")
-            title = opt.get("title", opt.get("key", "Умение"))
-            lvl = opt.get("next_level", 1)
-            uses_by_level = opt.get("uses_by_level", {})
-            after_uses = uses_by_level.get(lvl, "∞")
-            tag = "после повышения" if opt.get("already_known") else "при изучении"
-            lines.append(f"{i}. {emoji} {title} — {('улучшить до ' + str(lvl)) if opt.get('already_known') else 'новое'} "
-                         f"(заряды {tag}: {after_uses})")
-
-    await message.answer("\n".join(lines), reply_markup=city_menu_kb())
+    await message.answer(_character_text(p), reply_markup=city_menu_kb())

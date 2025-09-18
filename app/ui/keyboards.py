@@ -9,74 +9,49 @@ from aiogram.types import (
     InlineKeyboardMarkup, InlineKeyboardButton
 )
 
-# ---------- СОЗДАНИЕ ПЕРСОНАЖА (reply-клавиатура) ----------
+# ---------- СОЗДАНИЕ ПЕРСОНАЖА (inline) ----------
 
-def gender_kb() -> ReplyKeyboardMarkup:
-    """Клавиатура выбора пола"""
-    rows = [
-        [
-            KeyboardButton(text="👨 Мужчина"),
-            KeyboardButton(text="👩 Женщина"),
-        ]
-    ]
-    return ReplyKeyboardMarkup(
-        keyboard=rows,
-        resize_keyboard=True,
-        input_field_placeholder="Выберите пол персонажа"
+def gender_kb() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[[
+            InlineKeyboardButton(text="🧔 Мужчина", callback_data="gender_male"),
+            InlineKeyboardButton(text="👩 Женщина", callback_data="gender_female"),
+        ]]
     )
 
-def classes_kb() -> ReplyKeyboardMarkup:
-    """Клавиатура выбора класса"""
+def classes_kb() -> InlineKeyboardMarkup:
     rows = [
         [
-            KeyboardButton(text="🗡️ Мечник"),
-            KeyboardButton(text="✨ Послушник"),
+            InlineKeyboardButton(text="🗡️ Мечник", callback_data="class_pick_swordsman"),
+            InlineKeyboardButton(text="✨ Послушник", callback_data="class_pick_acolyte"),
         ],
         [
-            KeyboardButton(text="🔮 Маг"),
-            KeyboardButton(text="🏹 Лучник"),
+            InlineKeyboardButton(text="🔮 Маг", callback_data="class_pick_mage"),
+            InlineKeyboardButton(text="🏹 Лучник", callback_data="class_pick_archer"),
         ],
         [
-            KeyboardButton(text="🧾 Торговец"),
-            KeyboardButton(text="🗝️ Вор"),
-        ]
+            InlineKeyboardButton(text="🧾 Торговец", callback_data="class_pick_merchant"),
+            InlineKeyboardButton(text="🗝️ Вор", callback_data="class_pick_thief"),
+        ],
     ]
-    return ReplyKeyboardMarkup(
-        keyboard=rows,
-        resize_keyboard=True,
-        input_field_placeholder="Выберите класс персонажа"
-    )
+    return InlineKeyboardMarkup(inline_keyboard=rows)
 
-def confirm_kb() -> ReplyKeyboardMarkup:
-    """Клавиатура подтверждения"""
-    rows = [
-        [
-            KeyboardButton(text="✅ Подтвердить"),
-            KeyboardButton(text="❌ Отменить"),
-        ]
-    ]
-    return ReplyKeyboardMarkup(
-        keyboard=rows,
-        resize_keyboard=True,
-        input_field_placeholder="Подтвердите выбор"
+def confirm_kb() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[[
+            InlineKeyboardButton(text="✅ Подтвердить", callback_data="confirm_class"),
+            InlineKeyboardButton(text="↩️ Выбрать другой", callback_data="cancel_class"),
+        ]]
     )
 
 # ---------- ГОРОД (reply-клавиатура) ----------
+# Убрали «🏘️ В город». Добавили «🧾 Задания».
 
 def city_menu_kb() -> ReplyKeyboardMarkup:
-    # Лейблы ДОЛЖНЫ совпадать с хендлерами
     rows = [
-        [
-            KeyboardButton(text="🛒 Рынок"),
-            KeyboardButton(text="🕳️ Подземелья"),
-        ],
-        [
-            KeyboardButton(text="🍺 Таверна"),
-            KeyboardButton(text="🧍 Персонаж"),
-        ],
-        [
-            KeyboardButton(text="📦 Инвентарь"),
-        ],
+        [KeyboardButton(text="🛒 Рынок"), KeyboardButton(text="🕳️ Подземелья")],
+        [KeyboardButton(text="🍺 Таверна"), KeyboardButton(text="🧍 Персонаж")],
+        [KeyboardButton(text="📦 Инвентарь"), KeyboardButton(text="🧾 Задания")],
     ]
     return ReplyKeyboardMarkup(
         keyboard=rows,
@@ -84,9 +59,10 @@ def city_menu_kb() -> ReplyKeyboardMarkup:
         input_field_placeholder="…"
     )
 
+# Оставляем на случай, если где-то используется
 def back_to_city_kb() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="🏘️ В город")]],
+        keyboard=[[KeyboardButton(text="🧾 Задания")]],
         resize_keyboard=True
     )
 
@@ -100,8 +76,7 @@ def dungeon_pick_kb(names: List[str]) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 def room_actions_kb(*, can_camp: bool, has_exit: bool) -> InlineKeyboardMarkup:
-    rows = []
-    rows.append([InlineKeyboardButton(text="🔎 Исследовать", callback_data="dng_search")])
+    rows = [[InlineKeyboardButton(text="🔎 Исследовать", callback_data="dng_search")]]
     if can_camp:
         rows.append([InlineKeyboardButton(text="🔥 Привал", callback_data="dng_camp")])
     rows.append([InlineKeyboardButton(text="➡️ Идти дальше", callback_data="dng_next")])
@@ -110,12 +85,10 @@ def room_actions_kb(*, can_camp: bool, has_exit: bool) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 def confirm_leave_dungeon_kb() -> InlineKeyboardMarkup:
-    rows = [
-        [
-            InlineKeyboardButton(text="✅ Да, уйти", callback_data="dng_leave_yes"),
-            InlineKeyboardButton(text="❌ Остаться", callback_data="dng_leave_no"),
-        ]
-    ]
+    rows = [[
+        InlineKeyboardButton(text="✅ Да, уйти", callback_data="dng_leave_yes"),
+        InlineKeyboardButton(text="❌ Остаться", callback_data="dng_leave_no"),
+    ]]
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 # ---------- БОЙ (inline) ----------
@@ -130,8 +103,7 @@ def combat_actions_kb(has_skills: bool) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 def skills_pick_kb(keys: List[str]) -> InlineKeyboardMarkup:
-    rows = []
-    row = []
+    rows, row = [], []
     for i, _ in enumerate(keys, start=1):
         row.append(InlineKeyboardButton(text=str(i), callback_data=f"sk_{i}"))
         if len(row) == 4:

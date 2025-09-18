@@ -1,72 +1,69 @@
 # -*- coding: utf-8 -*-
 # app/core/emoji.py
-import re
 
-# Базовые словари по ключевым словам в названии
-WEAPON_EMOJI = {
-    r"меч|сабля|клинок|рапира": "🗡️",
-    r"лук|арбалет": "🏹",
-    r"посох|жезл|жезлы|жезель|сфера": "🍢",   # по запросу: посох = 🍢
-    r"булава|молот|кистень|цеп|пернач": "🔨",
-    r"топор|секира|бердыш": "🪓",
-    r"кинжал|нож(?!ницы)": "🔪",
-}
+from __future__ import annotations
 
-ARMOR_MATERIAL_EMOJI = {
-    r"кожан": "🧥",      # кожаная/кожаный/кожаное
-    r"роб|ряса|мант": "👘",  # роба/ряса/мантия
-}
-ARMOR_GENERIC = "🛡️"
+def _weapon_emoji(name: str) -> str:
+    n = name.lower()
+    if any(x in n for x in ["меч", "сабл", "клинок"]): return "🗡️"
+    if any(x in n for x in ["лук", "стрел"]): return "🏹"
+    if any(x in n for x in ["булав", "молот", "кузнеч"]): return "🔨"
+    if any(x in n for x in ["топор", "секир"]): return "🪓"
+    if any(x in n for x in ["кинжал", "нож"]): return "🔪"
+    if any(x in n for x in ["посох", "жезл", "жезел"]): return "🍢"  # по требованию
+    if any(x in n for x in ["копь", "пика"]): return "🥢"  # нейтральное копьё
+    return "⚔️"
 
-FOOD_KEYS = [r"провиант|еда|пай|паёк|рацион|хлеб|мясо|сухпай"]
-CAMP_KEYS = [r"костра|костёр|привал|палатка|лагер"]
+def _armor_emoji(material: str | None, name: str) -> str:
+    n = (name or "").lower()
+    if material == "leather" or "кожан" in n: return "🧥"
+    if material == "robe" or any(x in n for x in ["роб", "ряса", "мант"]): return "👘"
+    return "🛡️"
 
-def _match_any(name: str, patterns: dict[str, str]) -> str | None:
-    for rx, em in patterns.items():
-        if re.search(rx, name, flags=re.IGNORECASE):
-            return em
-    return None
-
-def _match_list(name: str, patterns: list[str]) -> bool:
-    return any(re.search(rx, name, flags=re.IGNORECASE) for rx in patterns)
-
-def emoji_for_item(name: str, kind: str | None = None, material_hint: str | None = None) -> str:
-    """
-    Подбирает подходящий эмодзи для предмета по названию.
-    kind — опционально: 'weapon' | 'armor' | 'consumable' | 'camp' | 'misc'
-    material_hint — опционально: 'leather'|'robe'
-    """
-    n = (name or "").strip()
-
-    # Consumables
-    if kind == "consumable" or _match_list(n, FOOD_KEYS):
-        return "🍗"
-    if kind == "camp" or _match_list(n, CAMP_KEYS):
-        return "🌳"
-
-    # Weapons
-    if kind == "weapon" or _match_any(n, WEAPON_EMOJI):
-        # если явно оружие — ищем конкретный вид
-        em = _match_any(n, WEAPON_EMOJI)
-        return em or "⚔"
-
-    # Armor
-    if kind == "armor" or re.search(r"брон|кольчуг|латы|доспех|панцир", n, re.I):
-        # материал приоритетнее
-        if material_hint == "leather" or re.search(r"кожан", n, re.I):
-            return ARMOR_MATERIAL_EMOJI[r"кожан"]
-        if material_hint == "robe" or re.search(r"роб|ряса|мант", n, re.I):
-            return ARMOR_MATERIAL_EMOJI[r"роб|ряса|мант"]
-        return ARMOR_GENERIC
-
-    # Попытка угадать по словам оружия
-    em_weap = _match_any(n, WEAPON_EMOJI)
-    if em_weap:
-        return em_weap
-
-    # По умолчанию
+def _misc_emoji(name: str) -> str:
+    n = name.lower()
+    if any(x in n for x in ["провиант","еда","паёк","пайок","мяс","хлеб"]): return "🍗"
+    if any(x in n for x in ["костра","костёр","костер","кэмп","camp"]): return "🌳"
+    if any(x in n for x in ["камн","самоцвет","драгоц","руда","железо"]): return "💎"
     return "📦"
 
-def decorate_item_name(name: str, kind: str | None = None, material_hint: str | None = None) -> str:
-    """ Возвращает строку 'EMOJI Название' """
-    return f"{emoji_for_item(name, kind, material_hint)} {name}"
+def decorate_item_name(name: str, kind: str | None, material: str | None = None) -> str:
+    """
+    Возвращает строку вида '<emoji> <name>' согласно правилам эмодзи.
+    kind ∈ {"weapon","armor","consumable","camp"} либо None.
+    material ∈ {"leather","robe"} либо None.
+    """
+    if kind == "weapon":
+        e = _weapon_emoji(name)
+    elif kind == "armor":
+        e = _armor_emoji(material, name)
+    elif kind == "camp":
+        e = "🌳"
+    elif kind == "consumable":
+        e = _misc_emoji(name)
+    else:
+        e = _misc_emoji(name)
+    return f"{e} {name}"
+
+# --- Редкость предметов (бейджи) ---
+RARITY_ICONS = {
+    "Обычный": "⚪",
+    "Редкий": "🔵",
+    "Легендарный": "🌟",
+}
+
+def rarity_badge(rarity: str) -> str:
+    """
+    Вернёт строку вида '⚪ Обычный' / '🔵 Редкий' / '🌟 Легендарный'.
+    Безопасно к лишним пробелам и регистру.
+    """
+    r = (rarity or "").strip()
+    key = (
+        "Обычный" if r.lower().startswith("обыч") else
+        "Редкий" if r.lower().startswith("редк") else
+        "Легендарный" if r.lower().startswith("леген") else
+        r
+    )
+    icon = RARITY_ICONS.get(key, "")
+    return f"{icon} {key}" if icon else key
+
