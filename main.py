@@ -6,14 +6,19 @@ from aiogram import Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from app.core.config import bot
-from app.features import creation, city, market, inventory, tavern, character
-from app.features import quests
+from app.features import campaigns, creation, city, market, inventory, tavern, character, quests
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(name)s | %(message)s")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+)
 logger = logging.getLogger("rpg-bot")
 
 async def main():
     dp = Dispatcher(storage=MemoryStorage())
+
+    # Порядок важен: /start теперь обрабатывается в campaigns.router
+    dp.include_router(campaigns.router)
     dp.include_router(creation.router)
     dp.include_router(city.router)
     dp.include_router(market.router)

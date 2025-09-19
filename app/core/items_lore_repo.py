@@ -11,21 +11,21 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class LoreItem:
     name: str
-    type: str                   # например: "оружие (булава/молот)"
-    allowed_classes: List[str]  # ["послушник","жрец",...]
-    rarity: str                 # "Обычный" | "Редкий" | "Легендарный"
+    type: str                   # : " (/)"
+    allowed_classes: List[str]  # ["","",...]
+    rarity: str                 # "" | "" | ""
     level: Tuple[int, int]      # (min, max)
     description: str
 
 DATA_TXT = Path(__file__).resolve().parents[1] / "data" / "items_lore.txt"
 
 _BLOCK_RE = re.compile(
-    r"Имя:\s*(?P<name>.+?)\s+"
-    r"Тип:\s*(?P<type>.+?)\s+"
-    r"Кто может носить:\s*(?P<who>.+?)\s+"
-    r"Редкость:\s*(?P<rarity>.+?)\s+"
-    r"Уровень:\s*(?P<lvl_min>\d+)\s*-\s*(?P<lvl_max>\d+)\s+"
-    r"Описание:\s*(?P<desc>.+?)\s*(?=(?:\n|\r|\Z)Имя:|\Z)",
+    r":\s*(?P<name>.+?)\s+"
+    r":\s*(?P<type>.+?)\s+"
+    r"  :\s*(?P<who>.+?)\s+"
+    r":\s*(?P<rarity>.+?)\s+"
+    r":\s*(?P<lvl_min>\d+)\s*-\s*(?P<lvl_max>\d+)\s+"
+    r":\s*(?P<desc>.+?)\s*(?=(?:\n|\r|\Z):|\Z)",
     re.DOTALL | re.IGNORECASE,
 )
 
@@ -35,9 +35,9 @@ def _clean_list(s: str) -> List[str]:
 
 def _norm_rarity(r: str) -> str:
     rl = (r or "").strip().lower()
-    if rl.startswith("обыч"): return "Обычный"
-    if rl.startswith("редк"): return "Редкий"
-    if rl.startswith("леген"): return "Легендарный"
+    if rl.startswith(""): return ""
+    if rl.startswith(""): return ""
+    if rl.startswith(""): return ""
     return (r or "").strip()
 
 def _parse_text(text: str) -> List[LoreItem]:
@@ -57,13 +57,13 @@ def _parse_text(text: str) -> List[LoreItem]:
 
 @lru_cache(maxsize=1)
 
-# ... остальной код сверху оставить как есть ...
+# ...       ...
 
 def _candidate_paths() -> list[Path]:
     here = Path(__file__).resolve()
-    # 1) рядом с модулем (как у тебя сейчас на скрине)
+    # 1)    (     )
     p1 = here.with_name("items_lore.txt")
-    # 2) в app/data/
+    # 2)  app/data/
     p2 = here.parents[1] / "data" / "items_lore.txt"
     return [p1, p2]
 
@@ -79,8 +79,8 @@ def _read_first_existing() -> str | None:
 @lru_cache(maxsize=1)
 def get_all_lore_items() -> list[LoreItem]:
     """
-    Ищем файл и рядом с модулем (app/core/items_lore.txt),
-    и в app/data/items_lore.txt. При любой проблеме возвращаем [].
+          (app/core/items_lore.txt),
+      app/data/items_lore.txt.     [].
     """
     text = _read_first_existing()
     if not text:
