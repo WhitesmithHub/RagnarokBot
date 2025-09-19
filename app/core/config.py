@@ -4,7 +4,12 @@
 from __future__ import annotations
 import os
 
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except Exception:
+    def load_dotenv(*args, **kwargs): pass
+load_dotenv()
+
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -13,8 +18,6 @@ try:
     from openai import AsyncOpenAI
 except Exception:
     AsyncOpenAI = None  # если пакет не установлен
-
-load_dotenv()
 
 # --- Telegram ---
 BOT_TOKEN = os.getenv("BOT_TOKEN")

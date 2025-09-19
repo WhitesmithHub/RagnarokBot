@@ -16,7 +16,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
     await state.update_data(campaign_id=None)
     items = campaigns_index()
     await message.answer(welcome_text())
-    await message.answer(" :", reply_markup=campaigns_kb(items))
+    await message.answer("Выбери кампанию:", reply_markup=campaigns_kb(items))
 
 @router.callback_query(F.data.startswith("camp:"))
 async def on_pick_campaign(cb: types.CallbackQuery, state: FSMContext):
@@ -29,11 +29,11 @@ async def on_pick_campaign(cb: types.CallbackQuery, state: FSMContext):
 async def on_campaigns_back(cb: types.CallbackQuery, state: FSMContext):
     await cb.answer()
     items = campaigns_index()
-    await cb.message.answer(" :", reply_markup=campaigns_kb(items))
+    await cb.message.answer("Выбери кампанию:", reply_markup=campaigns_kb(items))
 
 @router.callback_query(F.data.startswith("campok:"))
 async def on_campaign_confirm(cb: types.CallbackQuery, state: FSMContext):
-    await cb.answer(" ")
+    await cb.answer("Кампания выбрана")
     camp_id = cb.data.split(":", 1)[1]
     await state.update_data(campaign_id=camp_id)
-    await cb.message.answer(" ?", reply_markup=gender_kb())
+    await cb.message.answer("Кто ты?", reply_markup=gender_kb())
