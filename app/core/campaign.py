@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # app/core/campaign.py
 from __future__ import annotations
 
@@ -126,4 +126,7 @@ def arrival_text(hero_name: str, gender: str, campaign_id: str | None) -> str:
     fem = _is_female(gender, hero_name)
     verb = "подошла" if fem else "подошёл"
     city = data["arrival_city"]
-    return f"🏘️ <b>{city}</b>\n\n{hero_name} {verb} {data['arrival_suffix_text']}"
+    return f"🏘️ <b>{city}</b>\n\n{hero_name} {verb} {data['arrival_suffix_text']}"
+
+
+

@@ -2,7 +2,7 @@
 from typing import Dict, Optional
 from .models import Player
 
-# Простое in-memory хранилище (стабильная версия до подземелья)
+# РџСЂРѕСЃС‚РѕРµ in-memory С…СЂР°РЅРёР»РёС‰Рµ (СЃС‚Р°Р±РёР»СЊРЅР°СЏ РІРµСЂСЃРёСЏ РґРѕ РїРѕРґР·РµРјРµР»СЊСЏ)
 _PLAYERS: Dict[int, Player] = {}
 
 def save_player(p: Player) -> None:
@@ -13,3 +13,6 @@ def get_player(user_id: int) -> Optional[Player]:
 
 def has_player(user_id: int) -> bool:
     return user_id in _PLAYERS
+
+
+

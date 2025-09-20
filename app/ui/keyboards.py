@@ -7,40 +7,40 @@ from aiogram.types import (
     InlineKeyboardMarkup, InlineKeyboardButton
 )
 
-# ---------- КАМПАНИИ ----------
+# ---------- РљРђРњРџРђРќРР ----------
 def campaigns_kb(items: Iterable[Tuple[str, str]]) -> InlineKeyboardMarkup:
-    rows = [[InlineKeyboardButton(text=f"📜 {title}", callback_data=f"camp:{cid}")]
+    rows = [[InlineKeyboardButton(text=f"рџ“њ {title}", callback_data=f"camp:{cid}")]
             for cid, title in items]
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 def campaign_confirm_kb(campaign_id: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[[
-            InlineKeyboardButton(text="✅ Подтвердить", callback_data=f"campok:{campaign_id}"),
-            InlineKeyboardButton(text="↩️ Вернуться",   callback_data="campback"),
+            InlineKeyboardButton(text="вњ… РџРѕРґС‚РІРµСЂРґРёС‚СЊ", callback_data=f"campok:{campaign_id}"),
+            InlineKeyboardButton(text="в†©пёЏ Р’РµСЂРЅСѓС‚СЊСЃСЏ",   callback_data="campback"),
         ]]
     )
 
-# ---------- ПОЛ / КЛАССЫ ----------
+# ---------- РџРћР› / РљР›РђРЎРЎР« ----------
 def gender_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[[
-            InlineKeyboardButton(text="👩 Женщина", callback_data="gender_female"),
-            InlineKeyboardButton(text="👨 Мужчина",  callback_data="gender_male"),
+            InlineKeyboardButton(text="рџ‘© Р–РµРЅС‰РёРЅР°", callback_data="gender_female"),
+            InlineKeyboardButton(text="рџ‘Ё РњСѓР¶С‡РёРЅР°",  callback_data="gender_male"),
         ]]
     )
 
 def classes_kb() -> InlineKeyboardMarkup:
     rows = [
         [
-            InlineKeyboardButton(text="🗡️ Мечник",   callback_data="class_pick_swordsman"),
-            InlineKeyboardButton(text="🔮 Маг",      callback_data="class_pick_mage"),
-            InlineKeyboardButton(text="🗝️ Вор",      callback_data="class_pick_thief"),
+            InlineKeyboardButton(text="рџ—ЎпёЏ РњРµС‡РЅРёРє",   callback_data="class_pick_swordsman"),
+            InlineKeyboardButton(text="рџ”® РњР°Рі",      callback_data="class_pick_mage"),
+            InlineKeyboardButton(text="рџ—ќпёЏ Р’РѕСЂ",      callback_data="class_pick_thief"),
         ],
         [
-            InlineKeyboardButton(text="✨ Послушник", callback_data="class_pick_acolyte"),
-            InlineKeyboardButton(text="🏹 Лучник",    callback_data="class_pick_archer"),
-            InlineKeyboardButton(text="🧾 Торговец",  callback_data="class_pick_merchant"),
+            InlineKeyboardButton(text="вњЁ РџРѕСЃР»СѓС€РЅРёРє", callback_data="class_pick_acolyte"),
+            InlineKeyboardButton(text="рџЏ№ Р›СѓС‡РЅРёРє",    callback_data="class_pick_archer"),
+            InlineKeyboardButton(text="рџ§ѕ РўРѕСЂРіРѕРІРµС†",  callback_data="class_pick_merchant"),
         ],
     ]
     return InlineKeyboardMarkup(inline_keyboard=rows)
@@ -48,26 +48,26 @@ def classes_kb() -> InlineKeyboardMarkup:
 def confirm_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[[
-            InlineKeyboardButton(text="✅ Подтвердить", callback_data="confirm_class"),
-            InlineKeyboardButton(text="↩️ Назад",       callback_data="cancel_class"),
+            InlineKeyboardButton(text="вњ… РџРѕРґС‚РІРµСЂРґРёС‚СЊ", callback_data="confirm_class"),
+            InlineKeyboardButton(text="в†©пёЏ РќР°Р·Р°Рґ",       callback_data="cancel_class"),
         ]]
     )
 
-# ---------- ГОРОД (reply) ----------
+# ---------- Р“РћР РћР” (reply) ----------
 def city_menu_kb() -> ReplyKeyboardMarkup:
     rows = [
-        [KeyboardButton(text="🛒 Рынок"),     KeyboardButton(text="🕳️ Подземелья")],
-        [KeyboardButton(text="🍺 Таверна"),   KeyboardButton(text="🧍 Персонаж")],
-        [KeyboardButton(text="📦 Инвентарь"), KeyboardButton(text="🧾 Задания")],
-        [KeyboardButton(text="📜 Сюжет")],
+        [KeyboardButton(text="рџ›’ Р С‹РЅРѕРє"),     KeyboardButton(text="рџ•іпёЏ РџРѕРґР·РµРјРµР»СЊСЏ")],
+        [KeyboardButton(text="рџЌє РўР°РІРµСЂРЅР°"),   KeyboardButton(text="рџ§Ќ РџРµСЂСЃРѕРЅР°Р¶")],
+        [KeyboardButton(text="рџ“¦ РРЅРІРµРЅС‚Р°СЂСЊ"), KeyboardButton(text="рџ§ѕ Р—Р°РґР°РЅРёСЏ")],
+        [KeyboardButton(text="рџ“њ РЎСЋР¶РµС‚")],
     ]
     return ReplyKeyboardMarkup(
         keyboard=rows,
         resize_keyboard=True,
-        input_field_placeholder="…"
+        input_field_placeholder="вЂ¦"
     )
 
-# (на будущее)
+# (РЅР° Р±СѓРґСѓС‰РµРµ)
 def skills_pick_kb(keys: List[str]) -> InlineKeyboardMarkup:
     rows, row = [], []
     for i, _ in enumerate(keys, start=1):
@@ -76,5 +76,8 @@ def skills_pick_kb(keys: List[str]) -> InlineKeyboardMarkup:
             rows.append(row); row = []
     if row:
         rows.append(row)
-    rows.append([InlineKeyboardButton(text="↩️ Назад", callback_data="cmb_back")])
+    rows.append([InlineKeyboardButton(text="в†©пёЏ РќР°Р·Р°Рґ", callback_data="cmb_back")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+
