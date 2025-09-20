@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # app/core/emoji.py
-
 from __future__ import annotations
 
 def _weapon_emoji(name: str) -> str:
@@ -9,9 +8,9 @@ def _weapon_emoji(name: str) -> str:
     if any(x in n for x in ["лук", "стрел"]): return "🏹"
     if any(x in n for x in ["булав", "молот", "кузнеч"]): return "🔨"
     if any(x in n for x in ["топор", "секир"]): return "🪓"
-    if any(x in n for x in ["кинжал", "нож"]): return "🔪"
-    if any(x in n for x in ["посох", "жезл", "жезел"]): return "🍢"  # по требованию
-    if any(x in n for x in ["копь", "пика"]): return "🥢"  # нейтральное копьё
+    if any(x in n for x in ["кинжал", "нож", "катар"]): return "🔪"
+    if any(x in n for x in ["посох", "жезл", "жезел"]): return "🍢"  # как и просили ранее
+    if any(x in n for x in ["копь", "пика"]): return "🥢"
     return "⚔️"
 
 def _armor_emoji(material: str | None, name: str) -> str:
@@ -22,6 +21,9 @@ def _armor_emoji(material: str | None, name: str) -> str:
 
 def _misc_emoji(name: str) -> str:
     n = name.lower()
+    # 🔴 зелье лечения — строго 🍷
+    if "зелье" in n or "лечен" in n or "potion" in n:
+        return "🍷"
     if any(x in n for x in ["провиант","еда","паёк","пайок","мяс","хлеб"]): return "🍗"
     if any(x in n for x in ["костра","костёр","костер","кэмп","camp"]): return "🌳"
     if any(x in n for x in ["камн","самоцвет","драгоц","руда","железо"]): return "💎"
@@ -29,7 +31,7 @@ def _misc_emoji(name: str) -> str:
 
 def decorate_item_name(name: str, kind: str | None, material: str | None = None) -> str:
     """
-    Возвращает строку вида '<emoji> <name>' согласно правилам эмодзи.
+    Возвращает строку вида '<emoji> <name>'.
     kind ∈ {"weapon","armor","consumable","camp"} либо None.
     material ∈ {"leather","robe"} либо None.
     """
@@ -53,10 +55,6 @@ RARITY_ICONS = {
 }
 
 def rarity_badge(rarity: str) -> str:
-    """
-    Вернёт строку вида '⚪ Обычный' / '🔵 Редкий' / '🌟 Легендарный'.
-    Безопасно к лишним пробелам и регистру.
-    """
     r = (rarity or "").strip()
     key = (
         "Обычный" if r.lower().startswith("обыч") else
@@ -66,4 +64,3 @@ def rarity_badge(rarity: str) -> str:
     )
     icon = RARITY_ICONS.get(key, "")
     return f"{icon} {key}" if icon else key
-

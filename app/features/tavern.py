@@ -53,7 +53,14 @@ def unequip_menu_kb(can_weapon: bool, can_armor: bool) -> InlineKeyboardMarkup:
     rows.append([InlineKeyboardButton(text="↩️ Назад", callback_data="t_back")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
-# ---------- РЕПЛИКИ ТРАКТИРЩИКА ----------
+# ---------- РЕПЛИКИ ТРАКТИРЩИКА (всегда курсивом и с 👴) ----------
+
+def _wrap_barkeeper(text: str) -> str:
+    text = (text or "").strip()
+    # Если уже в кавычках — не дублируем
+    if not (text.startswith("«") or text.startswith('"')):
+        text = f'«{text}»'
+    return f'👴 <i>Трактирщик: {text}</i>'
 
 async def _npc_line() -> str:
     if USE_OPENAI and oai_client is not None:
@@ -61,14 +68,14 @@ async def _npc_line() -> str:
             resp = await oai_client.chat.completions.create(
                 model="gpt-4o-mini", temperature=0.9, max_tokens=80,
                 messages=[
-                    {"role": "system", "content": "Скажи короткую фразу (до 12 слов) от трактирщика. Без Markdown."},
-                    {"role": "user", "content": "Темно в городе, ходят слухи о ночных визитёрах. Дай атмосферную реплику."},
+                    {"role": "system", "content": "Короткая атмосферная реплика трактирщика (до 12 слов). Без разметки."},
+                    {"role": "user", "content": "Темно в городе, ходят слухи о ночных визитёрах."},
                 ],
             )
-            return f"Хозяин: {resp.choices[0].message.content.strip()}"
+            return _wrap_barkeeper(resp.choices[0].message.content)
         except Exception:
             pass
-    return "Хозяин: Раз уж занесло — грейся у огня и держи свечу под рукой."
+    return _wrap_barkeeper("Раз уж занесло — грейся у огня и держи свечу под рукой.")
 
 async def _npc_no_money_line(fee: int) -> str:
     if USE_OPENAI and oai_client is not None:
@@ -76,14 +83,14 @@ async def _npc_no_money_line(fee: int) -> str:
             resp = await oai_client.chat.completions.create(
                 model="gpt-4o-mini", temperature=0.9, max_tokens=50,
                 messages=[
-                    {"role": "system", "content": "Одна короткая реплика трактирщика, отказ из-за нехватки денег. Без Markdown."},
+                    {"role": "system", "content": "Короткая реплика трактирщика с отказом из-за нехватки денег. Без разметки."},
                     {"role": "user", "content": f"Гость не может оплатить постой ({fee} монет)."},
                 ],
             )
-            return f"Хозяин: {resp.choices[0].message.content.strip()}"
+            return _wrap_barkeeper(resp.choices[0].message.content)
         except Exception:
             pass
-    return "Хозяин: Эх, дружище, без монет и постель не согреет."
+    return _wrap_barkeeper("Эх, дружище, без монет и постель не согреет.")
 
 async def _npc_rest_success_line() -> str:
     if USE_OPENAI and oai_client is not None:
@@ -91,14 +98,14 @@ async def _npc_rest_success_line() -> str:
             resp = await oai_client.chat.completions.create(
                 model="gpt-4o-mini", temperature=0.8, max_tokens=60,
                 messages=[
-                    {"role": "system", "content": "Одна короткая ободряющая реплика после хорошего отдыха. Без Markdown."},
+                    {"role": "system", "content": "Короткая ободряющая реплика трактирщика после хорошего отдыха. Без разметки."},
                     {"role": "user", "content": "Гость выспался и готов к дороге."},
                 ],
             )
-            return f"Хозяин: {resp.choices[0].message.content.strip()}"
+            return _wrap_barkeeper(resp.choices[0].message.content)
         except Exception:
             pass
-    return "Хозяин: Лицо посвежело — значит, кровать честно отработала!"
+    return _wrap_barkeeper("Лицо посвежело — значит, кровать честно отработала!")
 
 # ---------- ВСПОМОГАТЕЛЬНОЕ ----------
 

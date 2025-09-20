@@ -2,13 +2,15 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run Bot (main.py)",
+      "name": "Run bot (module)",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/main.py",
+      "module": "app.main",
       "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}",
-      "justMyCode": true
+      "env": {
+        "BOT_TOKEN": "ТОКЕН_ЕСЛИ_НЕ_ИСПОЛЬЗУЕШЬ_.env",
+        "LOG_LEVEL": "INFO"
+      }
     }
   ]
 }
