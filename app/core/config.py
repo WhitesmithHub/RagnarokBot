@@ -16,6 +16,3 @@ if USE_OPENAI:
             oai_client = AsyncOpenAI(api_key=OPENAI_API_KEY)
     except Exception:
         oai_client = None
-
-
-
