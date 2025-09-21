@@ -5,9 +5,9 @@ from __future__ import annotations
 import random
 from typing import Dict, List, Optional
 
-# Кампания: затмение / возвращение вампирского князя (без «анти-нежити» и без контрол-чансов/продления дебаффов)
+# ВАЖНО: ключ кампании совпадает с UI — "eclipse"
 _CAMPAIGN_ITEMS: Dict[str, List[Dict]] = {
-    "vampire_eclipse": [
+    "eclipse": [
         # -------------------- SWORDSMAN --------------------
         # Обычный (1-5)
         {
@@ -245,73 +245,42 @@ _CAMPAIGN_ITEMS: Dict[str, List[Dict]] = {
 }
 
 def get_campaign_pool(campaign_id: Optional[str]) -> List[Dict]:
-    """Вернуть пул предметов кампании (или пустой список)."""
-    if not campaign_id:
-        return []
-    return list(_CAMPAIGN_ITEMS.get(campaign_id, []))
+    return list(_CAMPAIGN_ITEMS.get((campaign_id or "").strip(), []))
 
-def pick_campaign_items(
-    campaign_id: Optional[str],
-    k: int,
-    class_key: Optional[str] = None
-) -> List[Dict]:
-    """
-    Сэмпл предметов кампании. Если указан class_key — предметы подбираются
-    так, чтобы их мог надеть данный класс (через ключевые слова и материал).
-    """
+def pick_campaign_items(campaign_id: Optional[str], k: int, class_key: Optional[str] = None) -> List[Dict]:
     pool = get_campaign_pool(campaign_id)
-    if not pool:
+    if not pool or k <= 0:
         return []
 
-    def fits_class(item: Dict) -> bool:
+    # фильтр под класс
+    def fits(item: Dict) -> bool:
         if not class_key:
             return True
         name = (item.get("name") or "").lower()
         kind = item.get("kind")
         material = item.get("material")
-
         if kind == "weapon":
-            if class_key == "swordsman":
-                return any(w in name for w in ("меч", "клинок"))
-            if class_key == "archer":
-                return "лук" in name
-            if class_key == "thief":
-                return any(w in name for w in ("кинжал", "катар"))
-            if class_key == "mage":
-                return any(w in name for w in ("посох", "жезл"))
-            if class_key == "acolyte":
-                return any(w in name for w in ("булава", "молот"))
-            if class_key == "merchant":
-                return any(w in name for w in ("кинжал", "булава", "молот"))
-            return True
-
+            if class_key == "swordsman":  return any(w in name for w in ("меч","клинок"))
+            if class_key == "archer":     return "лук" in name
+            if class_key == "thief":      return any(w in name for w in ("кинжал","катар"))
+            if class_key == "mage":       return any(w in name for w in ("посох","жезл"))
+            if class_key == "acolyte":    return any(w in name for w in ("булава","молот"))
+            if class_key == "merchant":   return any(w in name for w in ("кинжал","булава","молот"))
         if kind == "armor":
-            if class_key == "mage":
-                return material == "robe"
-            if class_key in ("thief", "archer", "merchant"):
-                return material == "leather"
-            if class_key == "acolyte":
-                return material in ("robe", "leather")
-            if class_key == "swordsman":
-                return material in ("leather", "heavy")
-            return True
+            if class_key == "mage":       return material == "robe"
+            if class_key in ("thief","archer","merchant"): return material == "leather"
+            if class_key == "acolyte":    return material in ("robe","leather")
+            if class_key == "swordsman":  return material in ("leather","heavy")
         return True
 
-    filtered = [x for x in pool if fits_class(x)]
-    if not filtered:
-        filtered = pool  # fallback
-
-    k = max(0, min(k, len(filtered)))
-    return random.sample(filtered, k=k) if k else []
-
+    pool = [x for x in pool if fits(x)] or pool
+    k = min(k, len(pool))
+    return random.sample(pool, k=k)
 
 def find_campaign_item_by_name(name: str) -> Optional[Dict]:
-    """Поиск предмета по имени среди всех кампанийных пулов."""
-    if not name:
-        return None
-    n = name.strip().lower()
-    for items in _CAMPAIGN_ITEMS.values():
-        for it in items:
+    n = (name or "").strip().lower()
+    for lst in _CAMPAIGN_ITEMS.values():
+        for it in lst:
             if (it.get("name") or "").strip().lower() == n:
                 return it
     return None
