@@ -1,14 +1,15 @@
-{
+﻿{
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run bot (module)",
+      "name": "Run bot (app.main)",
       "type": "python",
       "request": "launch",
       "module": "app.main",
       "console": "integratedTerminal",
+      "justMyCode": true,
       "env": {
-        "BOT_TOKEN": "ТОКЕН_ЕСЛИ_НЕ_ИСПОЛЬЗУЕШЬ_.env",
+        "BOT_TOKEN": "${env:BOT_TOKEN}",
         "LOG_LEVEL": "INFO"
       }
     }

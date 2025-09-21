@@ -1,9 +1,9 @@
-﻿__pycache__/
+﻿.venv/
+__pycache__/
 *.pyc
-.venv/
 .env
-.env.*
-.vscode/
-.idea/
-*.log
-
+**/.env
+.saves/
+.DS_Store
+.vscode/settings.json
+settings.json
