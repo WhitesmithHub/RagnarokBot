@@ -3,7 +3,7 @@ __pycache__/
 *.pyc
 .env
 **/.env
-.local/
+.saves/
+.saves/**
 .vscode/settings.json
-saves/
-.DS_Store
+.local/
